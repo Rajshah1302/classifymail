@@ -15,7 +15,7 @@ const handler =  NextAuth({
       clientSecret: process.env.GOOGLE_SECRET,
       authorization: {
         params: {
-          scope: 'https://www.googleapis.com/auth/gmail.readonly openid email profile',
+          scope: 'https://mail.google.com/ openid email profile',
         },
       },
     }),
