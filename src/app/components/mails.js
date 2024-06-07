@@ -1,88 +1,132 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import Card from "./mailCard";
+import CardDetails from "./MailDetails/mailDetails";
 
-const Mails = ({ maxMails, session }) => {
-  // Define state variables for storing the fetched mail data
+const Mails = ({ session }) => {
+  const [maxMails, setMaxMails] = useState(5);
   const [mails, setMails] = useState([]);
+  const [selectedMail, setSelectedMail] = useState(null);
 
-  // Define a useEffect hook to fetch mail data when the component mounts or updates
   useEffect(() => {
-    // Define an async function to fetch mail data
     async function fetchEmails() {
       try {
-        // Send a GET request to the Gmail API to fetch mail data
-        const response = await axios.get(`https://gmail.googleapis.com/gmail/v1/users/${session.user.email}/messages`, {
-          // Provide authorization headers using the accessToken from the session object
-          headers: {
-            Authorization: `Bearer ${session.accessToken}`,
-          },
-          // Specify query parameters for the request, such as maxResults
-          params: {
-            maxResults: maxMails,
-          },
-        });
+        const response = await axios.get(
+          `https://gmail.googleapis.com/gmail/v1/users/${session.user.email}/messages`,
+          {
+            headers: {
+              Authorization: `Bearer ${session.accessToken}`,
+            },
+            params: {
+              maxResults: maxMails,
+            },
+          }
+        );
 
-        // Initialize an empty array to store the fetched mail data
         const fetchedMails = [];
 
-        // Iterate through each message in the response data
         for (const message of response.data.messages) {
           try {
-            // Send a GET request to fetch individual message data
-            const res2 = await axios.get(`https://gmail.googleapis.com/gmail/v1/users/${session.user.email}/messages/${message.id}`, {
-              // Provide authorization headers using the accessToken from the session object
-              headers: {
-                Authorization: `Bearer ${session.accessToken}`,
-              },
-            });
-            // Log the fetched message data to the console
-            console.log('Message data:', res2.data);
-            // Push the fetched message data into the fetchedMails array
+            const res2 = await axios.get(
+              `https://gmail.googleapis.com/gmail/v1/users/${session.user.email}/messages/${message.id}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${session.accessToken}`,
+                },
+              }
+            );
+            console.log("Message data:", res2.data);
             fetchedMails.push(res2.data);
-            // Here, you can process the individual message data if needed
           } catch (error) {
-            // Log any errors that occur during message data fetching
             console.error(`Error fetching message ${message.id} data:`, error);
           }
         }
-        // Set the state variable mails to the fetched mail data array
         setMails(fetchedMails);
       } catch (error) {
-        // Log any errors that occur during email fetching
-        console.error('Error fetching emails:', error);
+        console.error("Error fetching emails:", error);
       }
     }
 
-    // Call the fetchEmails function to initiate email fetching when the component mounts or updates
     fetchEmails();
-  }, [maxMails, session]); // Define dependencies for the useEffect hook
+  }, [maxMails, session]);
 
-  // Render the fetched mail data in a table
+  const handleCardClick = (mail) => {
+    console.log("selectedMail clicked");
+    setSelectedMail(mail);
+  };
+
+  const handleClose = () => {
+    setSelectedMail(null);
+  };
+
+  const handleClassifyClick = () => {
+    console.log("Classify button clicked");
+    // Add your classify logic here
+  };
+
   return (
-    <div>
-      <h2>Email Messages</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>From</th>
-            <th>To</th>
-            <th>Subject</th>
-            <th>Message</th>
-          </tr>
-        </thead>
-        <tbody>
-          {mails.map((mail, index) => (
-            <tr key={index}>
-              <td>{mail.date}</td>
-              <td>{mail.from}</td>
-              <td>{mail.to}</td>
-              <td>{mail.subject}</td>
-              <td>{mail.snippet}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div className="bg-white p-5 mt-2 shadow-lg border-lg">
+      <div style={{ display: "flex", justifyContent: "space-between" }} className="mb-2">
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <input
+            type="range"
+            min="1"
+            max="50"
+            value={maxMails}
+            onChange={(e) => setMaxMails(e.target.value)}
+            style={{ width: "100px", marginRight: "10px", boxShadow:'none' }}
+          />
+          <span>{maxMails}</span>
+        </div>
+
+        <button
+          onClick={handleClassifyClick}
+          style={{
+            maxWidth: '90px',
+            fontSize: "13px",
+            lineHeight: "1",
+            boxShadow: "none",
+            cursor: "pointer",
+          }}
+        >
+          Classify
+        </button>
+      </div>
+
+      <div
+        style={{
+          display: "block",
+          overflowY: "auto",
+          maxHeight: "500px",
+          scrollbarWidth: "none",
+          msOverflowStyle: "none",
+        }}
+      >
+        <style>
+          {`
+            ::-webkit-scrollbar {
+                display: none;
+            }
+        `}
+        </style>
+        {mails.map((mail, index) => {
+          const headers = mail.payload.headers;
+          const fromHeader = headers.find((header) => header.name === "From");
+          const cardName = fromHeader ? fromHeader.value : "Unknown Sender";
+          return (
+            <div onClick={() => handleCardClick(mail)} key={index}>
+              <Card name={cardName} description={mail.snippet} />
+            </div>
+          );
+        })}
+      </div>
+      {selectedMail && (
+        <CardDetails
+          name={selectedMail.payload.headers.find((header) => header.name === "From").value}
+          description={selectedMail.snippet}
+          onClose={handleClose}
+        />
+      )}
     </div>
   );
 };
