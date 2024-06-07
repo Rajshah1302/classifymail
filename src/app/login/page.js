@@ -1,18 +1,26 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { signIn } from "next-auth/react";
+import { useSession, signIn } from "next-auth/react";
 import "./styles.css";
+import { redirect } from "next/navigation";
+
 const NextLoginPage = () => {
   const [error, setError] = useState("");
   const [apiKey, setApiKey] = useState("");
   const [apiKeyInput, setApiKeyInput] = useState(""); // State to hold input value
+
+  const { data: session } = useSession();
 
   useEffect(() => {
     const storedApiKey = localStorage.getItem("openai_api_key");
     if (storedApiKey) {
       setApiKey(storedApiKey);
     }
-  }, []);
+    // Redirect the user if session exists
+    if (session) {
+      redirect("/temp");
+    }
+  }, [session]);
 
   const handleApiKeyChange = (event) => {
     setApiKeyInput(event.target.value);
@@ -29,29 +37,31 @@ const NextLoginPage = () => {
     }
   };
 
-  return (
+  const login = () => {
+    if (apiKey) saveApiKey();
+    signIn("google");
+  };
 
-    <div class="flex justify-center items-center min-h-screen bg-grey">
-      <div class="login-box">
-        <h2>ClassifyEmails</h2>
-        <form>
-          <div class="user-box">
-            <input type="text" name="" required="" />
-            <label>Open AI api key</label>
+  return (
+    <div className="flex justify-center items-center min-h-screen bg-grey">
+      <div class="login-container">
+        <h1>Login</h1>
+        <div id="loginForm">
+          <div class="input-group">
+            <label for="username">Open AI api key</label>
+            <input
+              type="text"
+              id="username"
+              name="username"
+              value={apiKeyInput}
+              onChange={handleApiKeyChange}
+            />
           </div>
 
-          <a
-            onClick={() => {
-              signIn("google");
-            }}
-          >
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
+          <button onClick={login}>
             Login
-          </a>
-        </form>
+          </button>
+        </div>
       </div>
     </div>
   );
