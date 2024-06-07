@@ -1,29 +1,26 @@
-'use client'
-import { useSession, signIn, signOut } from 'next-auth/react';
-import Mails from '../components/mails';
-
+"use client";
+import { useSession } from "next-auth/react";
+import Mails from "../components/mails";
+import { redirect } from "next/navigation";
+import "./temp.css";
+import Profile from "../components/profile";
+import { useState } from "react";
+import { Box } from "@mui/material";
+import Card from "../components/mailCard";
 function Component() {
   const { data: session } = useSession();
-  
-  return (
-    <div>
-      {!session ? (
-        <>
-          <p>Not signed in</p>
-          <button onClick={() => signIn('google')}>Sign in with Google</button>
-        </>
-      ) : (
-        <>
-          <p>Signed in as {session.user.email}</p>
-          <p>Access Token: {session.accessToken}</p>
-          <p>ID Token: {session.idToken}</p>
-          <button onClick={() => signOut()}>Sign out</button>
+  const [maxMails, setMaxMails] = useState(5);
+  if (!session) {
+    redirect("/login");
+  }
 
-          <Mails maxMails={5} session={session}/>
-          
-        </>
-      )}
-    </div>
+  return (
+    <>
+      <div class="container mx-auto px-40 py-5">
+        <Profile session={session} />
+        <Mails maxMails={maxMails} session={session} />
+      </div>
+    </>
   );
 }
 
