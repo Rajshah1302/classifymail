@@ -1,9 +1,10 @@
 'use client'
 import { useSession, signIn, signOut } from 'next-auth/react';
+import Mails from '../components/mails';
 
 function Component() {
   const { data: session } = useSession();
-
+  
   return (
     <div>
       {!session ? (
@@ -17,6 +18,9 @@ function Component() {
           <p>Access Token: {session.accessToken}</p>
           <p>ID Token: {session.idToken}</p>
           <button onClick={() => signOut()}>Sign out</button>
+
+          <Mails maxMails={5} session={session}/>
+          
         </>
       )}
     </div>
