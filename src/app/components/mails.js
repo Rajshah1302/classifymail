@@ -5,7 +5,7 @@ import CardDetails from "./MailDetails/mailDetails";
 import { Modal, Box, Typography } from "@mui/material";
 import Button from "@mui/material/Button";
 import { fetchEmails } from "../utils/fetchEmails";
-import { classifyEmail } from "../api/grow/route";
+import { classifyEmail } from "../api/groq/route";
 const Mails = ({ session }) => {
   const [maxMails, setMaxMails] = useState(5);
   const [mails, setMails] = useState([]);
