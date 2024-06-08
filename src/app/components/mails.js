@@ -4,6 +4,7 @@ import Card from "./mailCard";
 import CardDetails from "./MailDetails/mailDetails";
 import { Modal, Box, Typography } from "@mui/material";
 import Button from "@mui/material/Button";
+import { fetchEmails } from "../utils/fetchEmails";
 
 const Mails = ({ session }) => {
   const [maxMails, setMaxMails] = useState(5);
@@ -14,44 +15,7 @@ const Mails = ({ session }) => {
   const [classifyResult, setClassifyResult] = useState("");
 
   useEffect(() => {
-    async function fetchEmails() {
-      try {
-        const response = await axios.get(
-          `https://gmail.googleapis.com/gmail/v1/users/${session.user.email}/messages`,
-          {
-            headers: {
-              Authorization: `Bearer ${session.accessToken}`,
-            },
-            params: {
-              maxResults: maxMails,
-            },
-          }
-        );
-
-        const fetchedMails = [];
-
-        for (const message of response.data.messages) {
-          try {
-            const res2 = await axios.get(
-              `https://gmail.googleapis.com/gmail/v1/users/${session.user.email}/messages/${message.id}`,
-              {
-                headers: {
-                  Authorization: `Bearer ${session.accessToken}`,
-                },
-              }
-            );
-            fetchedMails.push(res2.data);
-          } catch (error) {
-            console.error(`Error fetching message ${message.id} data:`, error);
-          }
-        }
-        setMails(fetchedMails);
-      } catch (error) {
-        console.error("Error fetching emails:", error);
-      }
-    }
-
-    fetchEmails();
+    fetchEmails(session, maxMails, setMails);
   }, [maxMails, session]);
 
   const handleCardClick = (mail) => {
