@@ -20,4 +20,26 @@
 
     transform: translateY(-9px); /* Translate vertically by -5px on hover */
   }
+  .important {
+    color: red; /* Change color to whatever you want */
+  }
   
+  .promotions {
+    color: blue; /* Change color to whatever you want */
+  }
+  
+  .social {
+    color: green; /* Change color to whatever you want */
+  }
+  
+  .marketing {
+    color: orange; /* Change color to whatever you want */
+  }
+  
+  .spam {
+    color: purple; /* Change color to whatever you want */
+  }
+  
+  .general {
+    color: black; /* Change color to whatever you want */
+  }
