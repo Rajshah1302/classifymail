@@ -36,7 +36,7 @@ const Mails = ({ session }) => {
     try {
       const classifications = [];
       for (const mail of mails) {
-        const result = await classifyEmail(mail.snippet); // Call classifyEmail function
+        const result = await classifyEmail(mail.snippet,apiKey); // Call classifyEmail function
         classifications.push(result);
       }
       setClassifyResult(classifications);

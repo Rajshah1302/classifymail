@@ -1,10 +1,8 @@
 import Groq from "groq-sdk";
 
-const groq = new Groq({ apiKey: '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',dangerouslyAllowBrowser: true});
-
-export async function classifyEmail(emailSnippet) {
+export async function classifyEmail(emailSnippet, apiKey) {
   try {
-    const chatCompletion = await getGroqChatCompletion(emailSnippet);
+    const chatCompletion = await getGroqChatCompletion(emailSnippet, apiKey);
     const classification = chatCompletion.choices[0]?.message?.content || "Unknown";
     return classification;
   } catch (error) {
@@ -12,8 +10,10 @@ export async function classifyEmail(emailSnippet) {
     return "Error";
   }
 }
-    
-async function getGroqChatCompletion(emailSnippet) {
+
+async function getGroqChatCompletion(emailSnippet, apiKey) {
+  const groq = new Groq({ apiKey, dangerouslyAllowBrowser: true });
+
   return groq.chat.completions.create({
     messages: [
       {
@@ -33,11 +33,3 @@ Example Classifications:
   });
 }
 
-// Example usage:
-async function main() {
-  const emailSnippet = "This is a sample email snippet. It contains important information.";
-  const classification = await classifyEmail(emailSnippet);
-  console.log("Email Classification:", classification);
-}
-
-main();
