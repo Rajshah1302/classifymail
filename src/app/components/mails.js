@@ -5,57 +5,53 @@ import CardDetails from "./MailDetails/mailDetails";
 import { Modal, Box, Typography } from "@mui/material";
 import Button from "@mui/material/Button";
 import { fetchEmails } from "../utils/fetchEmails";
-
+import { classifyEmail } from "../api/grow/route";
 const Mails = ({ session }) => {
   const [maxMails, setMaxMails] = useState(5);
   const [mails, setMails] = useState([]);
   const [selectedMail, setSelectedMail] = useState(null);
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
   const [classifyLoading, setClassifyLoading] = useState(false);
   const [classifyResult, setClassifyResult] = useState("");
+  const [apiKey, setApiKey] = useState(
+    localStorage.getItem("groq_api_key") || ""
+  );
 
   useEffect(() => {
     fetchEmails(session, maxMails, setMails);
   }, [maxMails, session]);
 
-  const handleCardClick = (mail) => {
-    setSelectedMail(mail);
-  };
-
-  const handleClose = () => {
-    setSelectedMail(null);
-  };
-
+  const handleCardClick = (mail) => setSelectedMail(mail);
+  const handleClose = () => setSelectedMail(null);
   const handleOpen = () => setOpen(true);
   const handleClose2 = () => setOpen(false);
+
   const handleClassifyClick = async () => {
-    const api = localStorage.getItem("openai_api_key");
-    if (!api) {
+    if (!apiKey) {
       handleOpen();
-    } else {
-      setClassifyLoading(true);
-      try {
-        const snippets = mails.map((mail) => mail.snippet);
-        const response = await axios.post(
-          "https://api.openai.com/v1/classifications",
-          {
-            model: "text-categorization",
-            query: snippets,
-          },
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${api}`,
-            },
-          }
-        );
-        setClassifyResult(response.data);
-      } catch (error) {
-        console.error("Error classifying emails:", error);
-      } finally {
-        setClassifyLoading(false);
-      }
+      return;
     }
+
+    setClassifyLoading(true);
+    try {
+      const classifications = [];
+      for (const mail of mails) {
+        const result = await classifyEmail(mail.snippet); // Call classifyEmail function
+        classifications.push(result);
+      }
+      setClassifyResult(classifications);
+      console.log(classifyResult);
+    } catch (error) {
+      console.error("Error classifying emails:", error);
+    } finally {
+      setClassifyLoading(false);
+    }
+  };
+  const handleSaveApiKey = () => {
+    const key = document.getElementById("apiKeyInput").value;
+    localStorage.setItem("groq_api_key", key);
+    setApiKey(key);
+    handleClose2();
   };
 
   return (
@@ -103,6 +99,7 @@ const Mails = ({ session }) => {
                   .value
               }
               description={mail.snippet}
+              type={classifyResult[index]} // Assuming classifyResult is an array matching the mails array
             />
           </div>
         ))}
@@ -138,10 +135,10 @@ const Mails = ({ session }) => {
           }}
         >
           <Typography variant="h6" component="h2">
-            Please Enter Open AI api key
+            Please Enter Groq API Key
           </Typography>
-          <input id="modal-modal-description" sx={{ m: 2 }} className="mb-2" />
-          <button>Enter</button>
+          <input id="apiKeyInput" sx={{ m: 2 }} className="mb-2" />
+          <Button onClick={handleSaveApiKey}>Enter</Button>
         </Box>
       </Modal>
     </div>
