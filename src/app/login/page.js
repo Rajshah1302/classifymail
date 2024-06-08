@@ -30,10 +30,10 @@ const NextLoginPage = () => {
     // Update apiKey only if apiKeyInput is not empty
     if (apiKeyInput.trim() !== "") {
       setApiKey(apiKeyInput.trim());
-      localStorage.setItem("openai_api_key", apiKeyInput.trim());
+      localStorage.setItem("groq_api_key", apiKeyInput);
       setError("");
     } else {
-      setError("Please enter a valid OpenAI API key.");
+      setError("Please enter a valid Groq API key.");
     }
   };
 
@@ -48,7 +48,7 @@ const NextLoginPage = () => {
         <h1>Login</h1>
         <div id="loginForm">
           <div class="input-group">
-            <label for="username">Open AI api key</label>
+            <label for="username">Groq API key</label>
             <input
               type="text"
               id="username"
