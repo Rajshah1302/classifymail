@@ -2,6 +2,9 @@
 
 **Classify Emails** is a cutting-edge application that automates the organization of Gmail inboxes using advanced AI. By leveraging secure Google OAuth authentication, it fetches raw email data via the Gmail API and utilizes the Groq AI API to classify emails into categories like Promotions, Social, Updates, and Forums. This intelligent classification system streamlines email management, helping users quickly identify and prioritize important messages. The app's user-friendly interface allows for easy viewing, searching, and filtering of categorized emails, enhancing productivity and reducing the time spent on inbox maintenance. With its robust security and efficient email organization, **Classify Emails** is an essential tool for maintaining a clutter-free and manageable inbox.
 
+[https://github.com/Rajshah1302/classifymail/assets/141725750/ea178f7b-6956-45c6-a20c-057789d17c8f
+](https://github.com/Rajshah1302/classifymail/assets/141725750/1f47c219-1081-4a35-9e9e-42fce5bfecd5
+)
 ## Getting Started
 
 To get started with the development server, follow these steps:
